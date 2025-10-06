@@ -111,6 +111,7 @@ GameObject:
   - component: {fileID: 4086613827410831946}
   - component: {fileID: 3174042257083838283}
   - component: {fileID: 4591959458569932939}
+  - component: {fileID: -9222707528999338382}
   m_Layer: 0
   m_Name: Stuffie
   m_TagString: Untagged
@@ -255,6 +256,22 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.07809386, y: 0.06500055, z: 0.050309584}
   m_Center: {x: -0.0068379603, y: 0.018500268, z: -0.0034342576}
+--- !u!114 &-9222707528999338382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4891602635647096178}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c29ce9ead1847d44faf59f4009f797e7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sceneToLoad: NextScene
+  transitionDelay: 0.5
+  fadeTransition: 1
+  fadeTime: 1
 --- !u!1 &4986904249589679071
 GameObject:
   m_ObjectHideFlags: 0
