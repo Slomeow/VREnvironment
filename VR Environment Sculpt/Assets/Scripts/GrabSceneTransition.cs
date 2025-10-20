@@ -8,11 +8,14 @@ public class GrabSceneTransition : MonoBehaviour
     [SerializeField] private string sceneToLoad = "NextScene";
     [SerializeField] private float transitionDelay = 0.5f;
 
+    [Header("Optional Transition Effects")]
+    [SerializeField] private bool fadeTransition = true;
+    [SerializeField] private float fadeTime = 1f;
+
     private Grabbable grabbable;
     private bool hasTriggered = false;
-    private AsyncOperation asyncLoad;
 
-    async void Start()
+    void Start()
     {
         // Get the Grabbable component
         grabbable = GetComponent<Grabbable>();
@@ -25,24 +28,6 @@ public class GrabSceneTransition : MonoBehaviour
 
         // Subscribe to grab events
         grabbable.WhenPointerEventRaised += OnGrabEvent;
-
-        // Validate scene name before loading
-        if (string.IsNullOrEmpty(sceneToLoad))
-        {
-            Debug.LogError("Scene name is empty! Please set the scene name in the inspector.");
-            return;
-        }
-
-        Debug.Log($"Pre-loading scene: {sceneToLoad}");
-        asyncLoad = SceneManager.LoadSceneAsync(sceneToLoad);
-        asyncLoad.allowSceneActivation = false;
-
-        while (asyncLoad.progress < 0.9f)
-        {
-            await System.Threading.Tasks.Task.Yield();
-        }
-
-        Debug.Log($"Scene {sceneToLoad} is pre-loaded and ready to activate!");
     }
 
     void OnDestroy()
@@ -60,26 +45,27 @@ public class GrabSceneTransition : MonoBehaviour
         if (pointerEvent.Type == PointerEventType.Select && !hasTriggered)
         {
             hasTriggered = true;
-            Debug.Log("Object grabbed! Activating scene: " + sceneToLoad);
+            Debug.Log("Object grabbed! Transitioning to scene: " + sceneToLoad);
 
-            if (asyncLoad == null)
+            // Validate scene name before loading
+            if (string.IsNullOrEmpty(sceneToLoad))
             {
-                Debug.LogError("Scene was not pre-loaded! Cannot activate.");
+                Debug.LogError("Scene name is empty! Please set the scene name in the inspector.");
                 return;
             }
 
             if (transitionDelay > 0)
             {
-                Invoke(nameof(ActivateScene), transitionDelay);
+                Invoke(nameof(LoadScene), transitionDelay);
             }
             else
             {
-                ActivateScene();
+                LoadScene();
             }
         }
     }
 
-    private void ActivateScene()
+    private void LoadScene()
     {
         // Disable GrabAndLocate components to prevent null reference errors
         var grabAndLocates = FindObjectsOfType<Meta.XR.MRUtilityKit.BuildingBlocks.GrabAndLocate>();
@@ -91,7 +77,21 @@ public class GrabSceneTransition : MonoBehaviour
             }
         }
 
-        asyncLoad.allowSceneActivation = true;
-        Debug.Log("Scene activated");
+        if (fadeTransition)
+        {
+            StartCoroutine(FadeAndLoadScene());
+        }
+        else
+        {
+            SceneManager.LoadScene(sceneToLoad);
+        }
+    }
+
+    private System.Collections.IEnumerator FadeAndLoadScene()
+    {
+        // You can implement a fade effect here
+        // For now, just wait for fade time then load
+        yield return new WaitForSeconds(fadeTime);
+        SceneManager.LoadScene(sceneToLoad);
     }
 }
