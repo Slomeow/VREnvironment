@@ -127,10 +127,10 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4891602635647096178}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.11209129, y: 0.91850555, z: -0.07129624, w: 0.3724246}
+  m_LocalRotation: {x: -0.112092525, y: -0.9185068, z: 0.07129577, w: -0.37242106}
   m_LocalPosition: {x: 8.466153, y: 1.493166, z: -2.1791673}
-  m_LocalScale: {x: 13.299749, y: 13.299749, z: 13.299749}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 6, y: 6, z: 6}
+  m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 3376858954968237068}
   - {fileID: 633643805144143829}
@@ -164,7 +164,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -8693172909504858975, guid: 7e89b744867ebf64a9f1afb904ff987e, type: 3}
+  - {fileID: 2100000, guid: 071a372037f6ae942a552fd39b9009ef, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -268,7 +268,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c29ce9ead1847d44faf59f4009f797e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneToLoad: NextScene
+  sceneToLoad: VR World
   transitionDelay: 0.5
   fadeTransition: 1
   fadeTime: 1

@@ -1,7 +1,7 @@
 using UnityEngine;
 using Oculus.Interaction;
 
-public class FadeObject : MonoBehaviour
+public class VRInteractiveObject : MonoBehaviour
 {
     [Header("Texture Settings")]
     [Tooltip("The texture to change to after interaction")]
@@ -126,23 +126,35 @@ public class FadeObject : MonoBehaviour
         // Wait for the specified delay
         yield return new WaitForSeconds(disappearDelay);
 
-        // Fade out if duration > 0
+        // Fade out by decreasing texture opacity
         if (fadeOutDuration > 0 && objMaterial != null)
         {
-            // Enable transparency on the material
+            // Enable transparency on the material if not already
             SetMaterialTransparent(objMaterial);
 
-            Color originalColor = objMaterial.color;
+            // Get current alpha from texture or start at 1
+            float startAlpha = objMaterial.color.a;
             float elapsed = 0f;
 
             while (elapsed < fadeOutDuration)
             {
                 elapsed += Time.deltaTime;
-                float alpha = Mathf.Lerp(1f, 0f, elapsed / fadeOutDuration);
-                objMaterial.color = new Color(originalColor.r, originalColor.g, originalColor.b, alpha);
+                float newAlpha = Mathf.Lerp(startAlpha, 0f, elapsed / fadeOutDuration);
+
+                // Update material color alpha to affect texture opacity
+                Color currentColor = objMaterial.color;
+                objMaterial.color = new Color(currentColor.r, currentColor.g, currentColor.b, newAlpha);
+
                 yield return null;
             }
+
+            // Ensure fully transparent at the end
+            Color finalColor = objMaterial.color;
+            objMaterial.color = new Color(finalColor.r, finalColor.g, finalColor.b, 0f);
         }
+
+        // Small delay to ensure final frame is rendered
+        yield return new WaitForSeconds(0.1f);
 
         // Destroy the object
         Destroy(gameObject);
