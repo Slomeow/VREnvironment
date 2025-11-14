@@ -71,7 +71,7 @@ public class VRGrabToFade : MonoBehaviour
     private void OnPointerEvent(PointerEvent pointerEvent)
     {
         // Check if it's an Unselect event (release after grabbing)
-        if (pointerEvent.Type == PointerEventType.Unselect && !isFading)
+        if (pointerEvent.Type == PointerEventType.Select && !isFading)
         {
             StartFade();
         }
