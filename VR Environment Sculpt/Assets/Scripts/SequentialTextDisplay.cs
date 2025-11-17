@@ -1,45 +1,63 @@
 using System.Collections;
-using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
 
-public class SequentialTextDisplay : MonoBehaviour
+public class SequentialButtonDisplay : MonoBehaviour
 {
-    [Header("Text Objects")]
-    [Tooltip("Array of Text/TMP objects to display sequentially")]
-    public GameObject[] textObjects;
+    [Header("Button Groups")]
+    [Tooltip("Each group represents a set of 3 buttons to display")]
+    public ButtonGroup[] buttonGroups;
 
     [Header("Timing")]
-    [Tooltip("Time in seconds between each text appearance")]
-    public float intervalBetweenTexts = 10f;
+    [Tooltip("Time in seconds between each button appearance")]
+    public float intervalBetweenButtons = 10f;
 
     [Header("Options")]
-    [Tooltip("Hide previous text when showing next one")]
-    public bool hidePreviousText = false;
-
     [Tooltip("Start sequence automatically on scene load")]
     public bool autoStart = true;
 
-    [Tooltip("Loop the sequence when finished")]
-    public bool loop = false;
+    [Header("Events")]
+    [Tooltip("Triggered when a new button group starts displaying")]
+    public UnityEvent<int> onGroupChanged;
 
-    private int currentIndex = 0;
+    private int currentGroupIndex = 0;
     private Coroutine displayCoroutine;
+    private bool waitingForSelection = false;
+
+    public int CurrentGroupIndex => currentGroupIndex;
+
+    [System.Serializable]
+    public class ButtonGroup
+    {
+        public Button button1;
+        public Button button2;
+        public Button button3;
+    }
 
     void Start()
     {
-        // Hide all text objects at start
-        foreach (GameObject textObj in textObjects)
+        // Hide all buttons at start and set up click listeners
+        foreach (ButtonGroup group in buttonGroups)
         {
-            if (textObj != null)
-            {
-                textObj.SetActive(false);
-            }
+            SetupButton(group.button1);
+            SetupButton(group.button2);
+            SetupButton(group.button3);
         }
 
         if (autoStart)
         {
             StartSequence();
+        }
+    }
+
+    private void SetupButton(Button btn)
+    {
+        if (btn != null)
+        {
+            btn.gameObject.SetActive(false);
+            btn.onClick.AddListener(() => OnButtonSelected(btn));
         }
     }
 
@@ -50,8 +68,8 @@ public class SequentialTextDisplay : MonoBehaviour
             StopCoroutine(displayCoroutine);
         }
 
-        currentIndex = 0;
-        displayCoroutine = StartCoroutine(DisplayTextsSequentially());
+        currentGroupIndex = 0;
+        displayCoroutine = StartCoroutine(DisplayButtonGroups());
     }
 
     public void StopSequence()
@@ -67,72 +85,103 @@ public class SequentialTextDisplay : MonoBehaviour
     {
         StopSequence();
 
-        foreach (GameObject textObj in textObjects)
+        foreach (ButtonGroup group in buttonGroups)
         {
-            if (textObj != null)
-            {
-                textObj.SetActive(false);
-            }
+            HideButton(group.button1);
+            HideButton(group.button2);
+            HideButton(group.button3);
         }
 
-        currentIndex = 0;
+        currentGroupIndex = 0;
+        waitingForSelection = false;
     }
 
-    private IEnumerator DisplayTextsSequentially()
+    private void OnButtonSelected(Button selectedButton)
     {
-        do
+        if (!waitingForSelection) return;
+
+        Debug.Log($"Button selected: {selectedButton.name}");
+
+        // Hide current group
+        ButtonGroup currentGroup = buttonGroups[currentGroupIndex];
+        HideButton(currentGroup.button1);
+        HideButton(currentGroup.button2);
+        HideButton(currentGroup.button3);
+
+        // Move to next group
+        currentGroupIndex++;
+        waitingForSelection = false;
+
+        // Continue the sequence
+        if (currentGroupIndex < buttonGroups.Length && displayCoroutine != null)
         {
-            for (int i = 0; i < textObjects.Length; i++)
+            // The coroutine will continue automatically
+        }
+        else if (currentGroupIndex >= buttonGroups.Length)
+        {
+            Debug.Log("All button groups completed!");
+            displayCoroutine = null;
+        }
+    }
+
+    private IEnumerator DisplayButtonGroups()
+    {
+        while (currentGroupIndex < buttonGroups.Length)
+        {
+            ButtonGroup currentGroup = buttonGroups[currentGroupIndex];
+
+            // Show button 1
+            if (currentGroup.button1 != null)
             {
-                if (textObjects[i] != null)
-                {
-                    // Hide previous text if option is enabled
-                    if (hidePreviousText && i > 0 && textObjects[i - 1] != null)
-                    {
-                        textObjects[i - 1].SetActive(false);
-                    }
-
-                    // Show current text
-                    textObjects[i].SetActive(true);
-                    currentIndex = i;
-
-                    // Wait for interval (except after the last text if not looping)
-                    if (i < textObjects.Length - 1 || loop)
-                    {
-                        yield return new WaitForSeconds(intervalBetweenTexts);
-                    }
-                }
+                currentGroup.button1.gameObject.SetActive(true);
+                yield return new WaitForSeconds(intervalBetweenButtons);
             }
 
-            // If looping, hide the last text before restarting
-            if (loop && hidePreviousText && textObjects.Length > 0)
+            // Show button 2
+            if (currentGroup.button2 != null)
             {
-                if (textObjects[textObjects.Length - 1] != null)
-                {
-                    textObjects[textObjects.Length - 1].SetActive(false);
-                }
+                currentGroup.button2.gameObject.SetActive(true);
+                yield return new WaitForSeconds(intervalBetweenButtons);
             }
 
-        } while (loop);
+            // Show button 3
+            if (currentGroup.button3 != null)
+            {
+                currentGroup.button3.gameObject.SetActive(true);
+            }
+
+            // Wait for user selection
+            waitingForSelection = true;
+            yield return new WaitUntil(() => !waitingForSelection);
+        }
 
         displayCoroutine = null;
     }
 
-    // Optional: Manually trigger next text
-    public void ShowNextText()
+    private void HideButton(Button btn)
     {
-        if (currentIndex < textObjects.Length - 1)
+        if (btn != null)
         {
-            if (hidePreviousText && textObjects[currentIndex] != null)
-            {
-                textObjects[currentIndex].SetActive(false);
-            }
-
-            currentIndex++;
-            if (textObjects[currentIndex] != null)
-            {
-                textObjects[currentIndex].SetActive(true);
-            }
+            btn.gameObject.SetActive(false);
         }
+    }
+
+    // Optional: Get which button was selected (call this to retrieve selection data)
+    public void OnButton1Selected()
+    {
+        Debug.Log("User selected Option 1");
+        // Add your custom logic here
+    }
+
+    public void OnButton2Selected()
+    {
+        Debug.Log("User selected Option 2");
+        // Add your custom logic here
+    }
+
+    public void OnButton3Selected()
+    {
+        Debug.Log("User selected Option 3");
+        // Add your custom logic here
     }
 }
