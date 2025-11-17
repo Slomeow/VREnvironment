@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.UI;
-//using static System.Net.Mime.MediaTypeNames;
 
 public class CanvasImageSwitcher : MonoBehaviour
 {
@@ -33,6 +32,8 @@ public class CanvasImageSwitcher : MonoBehaviour
     // This method will be called by the SequentialButtonDisplay script
     public void OnGroupChanged(int groupIndex)
     {
+        Debug.Log($"OnGroupChanged called with index: {groupIndex}");
+
         if (targetImage == null)
         {
             Debug.LogError("Target Image is not assigned!");
@@ -41,7 +42,7 @@ public class CanvasImageSwitcher : MonoBehaviour
 
         if (groupIndex < 0 || groupIndex >= groupImages.Length)
         {
-            Debug.LogWarning($"Group index {groupIndex} is out of range for groupImages array!");
+            Debug.LogWarning($"Group index {groupIndex} is out of range for groupImages array (size: {groupImages.Length})!");
             return;
         }
 
@@ -54,7 +55,7 @@ public class CanvasImageSwitcher : MonoBehaviour
         // Switch to the corresponding image
         targetImage.sprite = groupImages[groupIndex];
 
-        Debug.Log($"Switched to image for group {groupIndex}");
+        Debug.Log($"Switched to image for group {groupIndex}: {groupImages[groupIndex].name}");
     }
 
     // Optional: Method to manually switch to a specific group's image

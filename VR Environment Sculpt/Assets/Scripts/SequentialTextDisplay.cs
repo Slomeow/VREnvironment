@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class SequentialButtonDisplay : MonoBehaviour
+public class SequentialTextDisplay : MonoBehaviour
 {
     [Header("Button Groups")]
     [Tooltip("Each group represents a set of 3 buttons to display")]
@@ -57,8 +57,16 @@ public class SequentialButtonDisplay : MonoBehaviour
         if (btn != null)
         {
             btn.gameObject.SetActive(false);
-            btn.onClick.AddListener(() => OnButtonSelected(btn));
+            // Add our listener without removing existing ones
+            btn.onClick.AddListener(() => OnAnyButtonClicked(btn));
         }
+    }
+
+    private void OnAnyButtonClicked(Button clickedButton)
+    {
+        // This just handles the sequence progression
+        // The button's original onClick events will still fire
+        OnButtonSelected(clickedButton);
     }
 
     public void StartSequence()
@@ -100,7 +108,10 @@ public class SequentialButtonDisplay : MonoBehaviour
     {
         if (!waitingForSelection) return;
 
-        Debug.Log($"Button selected: {selectedButton.name}");
+        Debug.Log($"Button selected: {selectedButton.name} from group {currentGroupIndex}");
+
+        // Note: The button's original onClick events have already fired at this point
+        // This method just handles hiding the group and moving to the next one
 
         // Hide current group
         ButtonGroup currentGroup = buttonGroups[currentGroupIndex];
@@ -110,6 +121,7 @@ public class SequentialButtonDisplay : MonoBehaviour
 
         // Move to next group
         currentGroupIndex++;
+        Debug.Log($"Moving to group index: {currentGroupIndex}");
         waitingForSelection = false;
 
         // Continue the sequence
@@ -128,7 +140,11 @@ public class SequentialButtonDisplay : MonoBehaviour
     {
         while (currentGroupIndex < buttonGroups.Length)
         {
+            Debug.Log($"Starting display for button group index: {currentGroupIndex}");
             ButtonGroup currentGroup = buttonGroups[currentGroupIndex];
+
+            // Notify listeners that a new group is starting
+            onGroupChanged?.Invoke(currentGroupIndex);
 
             // Show button 1
             if (currentGroup.button1 != null)
@@ -152,7 +168,9 @@ public class SequentialButtonDisplay : MonoBehaviour
 
             // Wait for user selection
             waitingForSelection = true;
+            Debug.Log($"Waiting for button selection from group {currentGroupIndex}");
             yield return new WaitUntil(() => !waitingForSelection);
+            Debug.Log($"Selection received, currentGroupIndex is now: {currentGroupIndex}");
         }
 
         displayCoroutine = null;
