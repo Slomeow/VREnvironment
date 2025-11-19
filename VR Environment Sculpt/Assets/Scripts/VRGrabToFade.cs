@@ -13,6 +13,9 @@ public class VRGrabToFade : MonoBehaviour
     [Header("Optional Audio")]
     public AudioClip grabSound;
 
+    // near the top of VRGrabToFade
+    public PulsingGlowAffordance glowAffordance; // assign in inspector (optional)
+
     private Renderer objRenderer;
     private Material objMaterial;
     private AudioSource audioSource;
@@ -83,11 +86,18 @@ public class VRGrabToFade : MonoBehaviour
 
         isFading = true;
 
+        // Notify the glow affordance (if assigned)
+        if (glowAffordance != null)
+        {
+            glowAffordance.DisableGlow();
+        }
+
         // Play sound
         if (audioSource != null && grabSound != null)
         {
             audioSource.Play();
         }
+
 
         // Start fade sequence
         StartCoroutine(FadeOutSequence());
