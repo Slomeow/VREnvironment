@@ -27,6 +27,10 @@ public class DoorHandle : MonoBehaviour
     public float openSpeed = 2f;
     public float doorTime = 2f;
 
+    [Header("Optional Audio")]
+    public AudioClip grabSound;
+
+    private AudioSource audioSource;
     private Grabbable grabbable;
     private bool isOpen = false;
     private bool isOpening = false;
@@ -48,6 +52,14 @@ public class DoorHandle : MonoBehaviour
         {
             Debug.LogError("No door assigned! Drag the door into the Inspector.");
             return;
+        }
+
+        // Setup audio if clip is assigned
+        if (grabSound != null)
+        {
+            audioSource = gameObject.AddComponent<AudioSource>();
+            audioSource.clip = grabSound;
+            audioSource.playOnAwake = false;
         }
 
         // Set up door rotations
@@ -83,6 +95,12 @@ public class DoorHandle : MonoBehaviour
         isOpening = true;
         isOpen = true;
         float elapsedTime = 0f;
+
+        // Play sound
+        if (audioSource != null && grabSound != null)
+        {
+            audioSource.Play();
+        }
 
         while (elapsedTime < doorTime)
         {
