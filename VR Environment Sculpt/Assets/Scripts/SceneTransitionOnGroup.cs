@@ -61,5 +61,7 @@ public class SceneTransitionOnGroup : MonoBehaviour
 
             yield return null;
         }
+    }
+}
 
         // Ensure c

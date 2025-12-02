@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/VR World.unity
     guid: 7eb1c898c2bd23647bdaba03ae92c01f
+  - enabled: 1
+    path: Assets/Scenes/NarcolepsyTransition.unity
+    guid: cb6b55e8e495c854a8e75ef3ff63028d
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 7c568cd35fb07a24ca0049630a7de4d4,
       type: 2}

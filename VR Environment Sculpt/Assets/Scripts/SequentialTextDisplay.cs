@@ -22,6 +22,9 @@ public class SequentialTextDisplay : MonoBehaviour
     [Tooltip("Triggered when a new button group starts displaying")]
     public UnityEvent<int> onGroupChanged;
 
+    [Header("Scene Transition")]
+    public SceneTransitionOnGroup sceneTransition;
+
     private int currentGroupIndex = 0;
     private Coroutine displayCoroutine;
     private bool waitingForSelection = false;
@@ -122,6 +125,8 @@ public class SequentialTextDisplay : MonoBehaviour
         // Move to next group
         currentGroupIndex++;
         Debug.Log($"Moving to group index: {currentGroupIndex}");
+        sceneTransition.OnGroupChanged(currentGroupIndex);
+
         waitingForSelection = false;
 
         // Continue the sequence
