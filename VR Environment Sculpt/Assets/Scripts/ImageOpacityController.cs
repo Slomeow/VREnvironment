@@ -30,6 +30,9 @@ public class ImageOpacityController : MonoBehaviour
     private float targetOpacity = 0f;
     private float currentOpacity = 0f;
 
+    private bool isResetting = false;
+
+
     void Start()
     {
         if (targetRenderer == null)
@@ -64,6 +67,7 @@ public class ImageOpacityController : MonoBehaviour
 
     public void OnGroupChanged(int groupIndex)
     {
+        if (isResetting) return;
         if (targetMaterial == null) return;
 
         Debug.Log($"MaterialOpacityController: Group changed to {groupIndex}");
@@ -98,9 +102,24 @@ public class ImageOpacityController : MonoBehaviour
 
     public void ResetOpacity()
     {
+        isResetting = true;
         targetOpacity = 0f;
         currentOpacity = 0f;
         SetMaterialOpacity(0f);
+        Debug.Log("MaterialOpacityController: Opacity reset and ready to increase again.");
+
+    }
+
+    public void BlackOut()
+    {
+        targetOpacity = 1f;
+        currentOpacity = 1f;
+        SetMaterialOpacity(1f);
+    }
+
+    public void ResumeIncreasing()
+    {
+        isResetting = false;
     }
 
     // Ensures material supports alpha transparency
