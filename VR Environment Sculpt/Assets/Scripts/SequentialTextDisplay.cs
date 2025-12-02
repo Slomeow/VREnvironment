@@ -55,6 +55,19 @@ public class SequentialTextDisplay : MonoBehaviour
         }
     }
 
+    // NEW: Call this externally when user grabs something
+    public void BeginSequenceFromExternalTrigger()
+    {
+        if (displayCoroutine != null)
+        {
+            Debug.Log("Sequence already started — ignoring duplicate trigger.");
+            return;
+        }
+
+        Debug.Log("External trigger received — starting sequence.");
+        StartSequence();
+    }
+
     private void SetupButton(Button btn)
     {
         if (btn != null)
